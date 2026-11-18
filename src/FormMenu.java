@@ -29,6 +29,26 @@ public class FormMenu extends JFrame {
         setLocationRelativeTo(null);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+        // Abrir formulario de registro
+        btnRegistrar.addActionListener(e -> {
+
+            FormRegistro registro = new FormRegistro();
+
+            JFrame ventanaRegistro = new JFrame("BookUsers - Registro de usuarios");
+
+            ventanaRegistro.setContentPane(registro.getPanelPrincipal());
+
+            ventanaRegistro.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            ventanaRegistro.setSize(600, 750);
+
+            ventanaRegistro.setLocationRelativeTo(null);
+
+            ventanaRegistro.setVisible(true);
+
+        });
     }
 
     // Método principal
