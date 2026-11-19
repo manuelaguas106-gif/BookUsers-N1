@@ -30,3 +30,11 @@ bin/
 .DS_Store
 ### Java ###
 *.class
+# Datos privados de usuarios
+/usuarios.dat
+
+# Fotografías de usuarios
+/fotos/
+
+# Copias de seguridad
+/Respaldo/

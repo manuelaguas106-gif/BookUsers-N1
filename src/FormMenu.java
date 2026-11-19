@@ -32,7 +32,6 @@ public class FormMenu extends JFrame {
             }
         }
 
-
         setTitle("BookUsers - Menú principal");
 
         setContentPane(panelPrincipal);

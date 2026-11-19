@@ -118,6 +118,11 @@ public class FormListado {
                 int idUsuario = Integer.parseInt(
                         tablaUsuarios.getModel().getValueAt(filaModelo, 0).toString()
                 );
+                // Obtener el usuario antes de eliminarlo
+                Usuario usuarioAEliminar = usuarios.stream()
+                        .filter(usuario -> usuario.getId() == idUsuario)
+                        .findFirst()
+                        .orElse(null);
 
                 // Eliminar el usuario de la lista
                 boolean eliminado = usuarios.removeIf(
@@ -125,11 +130,49 @@ public class FormListado {
                 );
 
                 if (eliminado) {
+                    String rutaFotoEliminar = "";
 
-                    // Guardar los cambios permanentemente
+                    if (usuarioAEliminar != null &&
+                            usuarioAEliminar.getRutaFoto() != null) {
+
+                        rutaFotoEliminar = usuarioAEliminar.getRutaFoto();
+                    }
+                    String fotoAComprobar = rutaFotoEliminar;
+
+                    boolean fotoCompartida = !fotoAComprobar.isEmpty()
+                            && usuarios.stream().anyMatch(usuario ->
+                            fotoAComprobar.equals(usuario.getRutaFoto())
+                    );
+                    // Comprobar que la fotografía pertenece a la carpeta fotos
+                    java.nio.file.Path carpetaFotos =
+                            java.nio.file.Paths.get("fotos").toAbsolutePath().normalize();
+
+                    java.nio.file.Path archivoFotoEliminar = null;
+
+                    if (!fotoAComprobar.isEmpty()) {
+                        java.nio.file.Path rutaCandidata =
+                                java.nio.file.Paths.get(fotoAComprobar)
+                                        .toAbsolutePath()
+                                        .normalize();
+
+                        if (rutaCandidata.startsWith(carpetaFotos)
+                                && !rutaCandidata.equals(carpetaFotos)) {
+                            archivoFotoEliminar = rutaCandidata;
+                        }
+                    }
+
                     ArchivoUsuarios.guardarUsuarios(usuarios);
-
-                    // Actualizar la tabla
+                    if (!fotoCompartida && archivoFotoEliminar != null) {
+                        try {
+                            java.nio.file.Files.deleteIfExists(archivoFotoEliminar);
+                        } catch (java.io.IOException ex) {
+                            JOptionPane.showMessageDialog(
+                                    panelPrincipal,
+                                    "El usuario fue eliminado, pero no se pudo borrar su fotografía: "
+                                            + ex.getMessage()
+                            );
+                        }
+                    }
                     cargarUsuarios(usuarios);
 
                     JOptionPane.showMessageDialog(
@@ -188,6 +231,12 @@ public class FormListado {
             ventanaEditar.setLocationRelativeTo(null);
             ventanaEditar.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             ventanaEditar.setVisible(true);
+            ventanaEditar.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    cargarUsuarios(usuarios);
+                }
+            });
 
 
         });
