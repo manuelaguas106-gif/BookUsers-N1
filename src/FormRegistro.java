@@ -23,6 +23,19 @@ public class FormRegistro {
     private JButton btnGuardar;
     private JButton btnVolver;
 
+
+    // Lista para almacenar los usuarios
+    private java.util.ArrayList<Usuario> usuarios;
+
+    // Número para identificar al siguiente usuario
+    private int siguienteId;
+
+    // Recibir el siguiente ID disponible
+    public void setSiguienteId(int siguienteId) {
+        this.siguienteId = siguienteId;
+    }
+
+
     // Constructor del formulario
     public FormRegistro() {
 
@@ -72,9 +85,59 @@ public class FormRegistro {
         btnGuardar.addActionListener(e -> {
 
             if (validarCampos()) {
+
+                if (usuarios == null) {
+                    JOptionPane.showMessageDialog(
+                            panelPrincipal,
+                            "No se ha configurado la lista de usuarios."
+                    );
+                    return;
+                }
+
+                // Obtener los datos del formulario
+                String tipoId = cmbTipoId.getSelectedItem().toString();
+                String numeroId = txtNumeroId.getText().trim();
+                String primerNombre = txtPrimerNombre.getText().trim();
+                String segundoNombre = txtSegundoNombre.getText().trim();
+                String primerApellido = txtPrimerApellido.getText().trim();
+                String segundoApellido = txtSegundoApellido.getText().trim();
+                String username = lblUsername.getText();
+                String password = new String(txtPassword.getPassword());
+                String telefono = txtTelefono.getText().trim();
+                String correo = txtCorreo.getText().trim();
+
+                // Crear el objeto Usuario
+                Usuario nuevoUsuario = new Usuario(
+                        siguienteId,
+                        tipoId,
+                        numeroId,
+                        primerNombre,
+                        segundoNombre,
+                        primerApellido,
+                        segundoApellido,
+                        username,
+                        password,
+                        telefono,
+                        correo,
+                        ""
+                );
+
+                // Asignar un ID único al nuevo usuario
+                int nuevoId = usuarios.stream()
+                        .mapToInt(Usuario::getId)
+                        .max()
+                        .orElse(0) + 1;
+
+                nuevoUsuario.setId(nuevoId);
+
+                // Guardar en la lista
+                usuarios.add(nuevoUsuario);
+
+                ArchivoUsuarios.guardarUsuarios(usuarios);
+
                 JOptionPane.showMessageDialog(
                         panelPrincipal,
-                        "Validación inicial correcta. Pendiente guardar usuario."
+                        "Usuario registrado correctamente."
                 );
             }
 
@@ -201,4 +264,8 @@ public class FormRegistro {
             lblUsername.setText(username);
         }
 
-    }
+            // Recibir la lista de usuarios del menú principal
+            public void setUsuarios(java.util.ArrayList<Usuario> usuarios) {
+                this.usuarios = usuarios;
+            }
+        }
