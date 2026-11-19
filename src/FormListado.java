@@ -12,6 +12,9 @@ public class FormListado {
     private JLabel lblTitulo;
     private JTable tablaUsuarios;
     private JTextField txtBuscar;
+    private JButton btnEliminar;
+    private JButton btnEditar;
+    private java.util.ArrayList<Usuario> usuarios;
 
     public FormListado() {
 
@@ -88,12 +91,115 @@ public class FormListado {
             }
         });
 
+        btnEliminar.addActionListener(e -> {
+            int filaSeleccionada = tablaUsuarios.getSelectedRow();
+
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(
+                        panelPrincipal,
+                        "Por favor, selecciona un usuario para eliminar."
+                );
+                return;
+            }
+
+            int confirmacion = JOptionPane.showConfirmDialog(
+                    panelPrincipal,
+                    "¿Estás seguro de que deseas eliminar este usuario?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+
+                int filaModelo = tablaUsuarios.convertRowIndexToModel(filaSeleccionada);
+
+                // Obtener el ID del usuario seleccionado
+                int idUsuario = Integer.parseInt(
+                        tablaUsuarios.getModel().getValueAt(filaModelo, 0).toString()
+                );
+
+                // Eliminar el usuario de la lista
+                boolean eliminado = usuarios.removeIf(
+                        usuario -> usuario.getId() == idUsuario
+                );
+
+                if (eliminado) {
+
+                    // Guardar los cambios permanentemente
+                    ArchivoUsuarios.guardarUsuarios(usuarios);
+
+                    // Actualizar la tabla
+                    cargarUsuarios(usuarios);
+
+                    JOptionPane.showMessageDialog(
+                            panelPrincipal,
+                            "Usuario eliminado correctamente."
+                    );
+                }
+            }
+        });
+
+        btnEditar.addActionListener(e -> {
+
+            int filaSeleccionada = tablaUsuarios.getSelectedRow();
+
+            if (filaSeleccionada == -1) {
+                JOptionPane.showMessageDialog(
+                        panelPrincipal,
+                        "Por favor, selecciona un usuario para editar."
+                );
+                return;
+            }
+
+
+            int filaModelo = tablaUsuarios.convertRowIndexToModel(filaSeleccionada);
+
+            int idUsuario = Integer.parseInt(
+                    tablaUsuarios.getModel().getValueAt(filaModelo, 0).toString()
+            );
+
+            Usuario usuarioSeleccionado = null;
+
+            for (Usuario usuario : usuarios) {
+                if (usuario.getId() == idUsuario) {
+                    usuarioSeleccionado = usuario;
+                    break;
+                }
+            }
+
+            if (usuarioSeleccionado == null) {
+                JOptionPane.showMessageDialog(
+                        panelPrincipal,
+                        "No se encontró el usuario seleccionado."
+                );
+                return;
+            }
+
+            FormRegistro formulario = new FormRegistro();
+
+            formulario.setUsuarios(usuarios);
+
+            formulario.cargarUsuarioParaEditar(usuarioSeleccionado);
+
+            JFrame ventanaEditar = new JFrame("Editar usuario");
+            ventanaEditar.setContentPane(formulario.getPanelPrincipal());
+            ventanaEditar.pack();
+            ventanaEditar.setLocationRelativeTo(null);
+            ventanaEditar.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            ventanaEditar.setVisible(true);
+
+
+        });
 
     }
 
-        public void cargarUsuarios(java.util.ArrayList<Usuario> usuarios) {
 
-            javax.swing.table.DefaultTableModel modelo =
+    public void cargarUsuarios(java.util.ArrayList<Usuario> usuarios) {
+
+        this.usuarios = usuarios;
+
+        javax.swing.table.DefaultTableModel modelo =
                     (javax.swing.table.DefaultTableModel) tablaUsuarios.getModel();
 
             modelo.setRowCount(0);

@@ -27,6 +27,8 @@ public class FormRegistro {
     // Lista para almacenar los usuarios
     private java.util.ArrayList<Usuario> usuarios;
 
+    private Usuario usuarioEnEdicion = null;
+
     // Número para identificar al siguiente usuario
     private int siguienteId;
 
@@ -34,7 +36,26 @@ public class FormRegistro {
     public void setSiguienteId(int siguienteId) {
         this.siguienteId = siguienteId;
     }
+        public void cargarUsuarioParaEditar(Usuario usuario) {
 
+            this.usuarioEnEdicion = usuario;
+
+            cmbTipoId.setSelectedItem(usuario.getTipoIdentificacion());
+            txtNumeroId.setText(usuario.getNumeroIdentificacion());
+
+            txtPrimerNombre.setText(usuario.getPrimerNombre());
+            txtSegundoNombre.setText(usuario.getSegundoNombre());
+
+            txtPrimerApellido.setText(usuario.getPrimerApellido());
+            txtSegundoApellido.setText(usuario.getSegundoApellido());
+
+            txtTelefono.setText(usuario.getTelefono());
+            txtCorreo.setText(usuario.getCorreo());
+
+            lblUsername.setText(usuario.getUsername());
+
+            btnGuardar.setText("Guardar cambios");
+        }
 
     // Constructor del formulario
     public FormRegistro() {
@@ -105,6 +126,28 @@ public class FormRegistro {
                 String password = new String(txtPassword.getPassword());
                 String telefono = txtTelefono.getText().trim();
                 String correo = txtCorreo.getText().trim();
+
+                if (usuarioEnEdicion != null) {
+
+                    usuarioEnEdicion.setTipoIdentificacion(tipoId);
+                    usuarioEnEdicion.setNumeroIdentificacion(numeroId);
+                    usuarioEnEdicion.setPrimerNombre(primerNombre);
+                    usuarioEnEdicion.setSegundoNombre(segundoNombre);
+                    usuarioEnEdicion.setPrimerApellido(primerApellido);
+                    usuarioEnEdicion.setSegundoApellido(segundoApellido);
+                    usuarioEnEdicion.setUsername(username);
+                    usuarioEnEdicion.setTelefono(telefono);
+                    usuarioEnEdicion.setCorreo(correo);
+
+                    ArchivoUsuarios.guardarUsuarios(usuarios);
+
+                    JOptionPane.showMessageDialog(
+                            panelPrincipal,
+                            "Usuario actualizado correctamente."
+                    );
+
+                    return;
+                }
 
                 // Crear el objeto Usuario
                 Usuario nuevoUsuario = new Usuario(
